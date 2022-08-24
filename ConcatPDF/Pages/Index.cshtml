@@ -1,0 +1,20 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Spoji PDF datoteke</h1>
+</div>
+
+<form enctype="multipart/form-data" method="post">
+	<dl>
+		<dt><label asp-for="FileUpload.PDFFiles"></label></dt>
+		<dd>
+			<input asp-for="FileUpload.PDFFiles" type="file" multiple>
+			<span asp-validation-for="FileUpload.PDFFiles"></span>
+		</dd>
+	</dl>
+	<input asp-page-handler="Upload" type="submit" value="Spoji" />
+</form>
