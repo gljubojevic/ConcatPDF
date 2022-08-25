@@ -57,8 +57,18 @@ namespace ConcatPDF.Pages
 						PdfSharpCore.Pdf.IO.PdfDocumentOpenMode.Import
 					);
 					_logger.LogInformation("Adding file: {0}, pages: {1}", pdf.FileName, doc.PageCount);
+					bool outlineAdded = false;
 					foreach (var p in doc.Pages)
-					{ combinedPDF.AddPage(p); }
+					{
+						var addedPage = combinedPDF.AddPage(p);
+						// add document file name to destination outline (table of content)
+						if (outlineAdded) { continue; }
+						combinedPDF.Outlines.Add(
+							pdf.FileName
+							,addedPage, false
+						);
+						outlineAdded = true;
+					}
 				}
 				catch (System.Exception ex)
 				{
