@@ -13,10 +13,13 @@ namespace ConcatPDF.Pages
 		public IndexModel(ILogger<IndexModel> logger)
 		{
 			_logger = logger;
+			ProcessingErrors = new List<string>();
 		}
 
 		[BindProperty]
 		public BufferedMultipleFileUpload FileUpload { get; set; }
+
+		public List<string> ProcessingErrors {get; private set;}
 
 		public void OnGet()
 		{
@@ -28,6 +31,7 @@ namespace ConcatPDF.Pages
 			if (null == FileUpload.PDFFiles || !ModelState.IsValid)
 			{
 				_logger.LogError("PDF files missing");
+				ProcessingErrors.Add("PDF datoteke nisu odabrane!");
 				return Page();
 			}
 
@@ -41,24 +45,37 @@ namespace ConcatPDF.Pages
 				if (0 == pdf.Length)
 				{
 					_logger.LogError("PDF {0} empty", pdf.FileName);
+					ProcessingErrors.Add(string.Format("PDF datoteka \"{0}\" je prazna!", pdf.FileName));
 					continue;
 				}
 
-				// copy pages to combined document
-				var doc = PdfSharpCore.Pdf.IO.PdfReader.Open(
-					pdf.OpenReadStream(),
-					PdfSharpCore.Pdf.IO.PdfDocumentOpenMode.Import
-				);
-				_logger.LogInformation("Adding file: {0}, pages: {1}", pdf.FileName, doc.PageCount);
-				foreach (var p in doc.Pages)
-				{ combinedPDF.AddPage(p); }
-				
+				try
+				{
+					// copy pages to combined document
+					var doc = PdfSharpCore.Pdf.IO.PdfReader.Open(
+						pdf.OpenReadStream(),
+						PdfSharpCore.Pdf.IO.PdfDocumentOpenMode.Import
+					);
+					_logger.LogInformation("Adding file: {0}, pages: {1}", pdf.FileName, doc.PageCount);
+					foreach (var p in doc.Pages)
+					{ combinedPDF.AddPage(p); }
+				}
+				catch (System.Exception ex)
+				{
+					ProcessingErrors.Add(string.Format("PDF datoteka \"{0}\" je nesipravna!", pdf.FileName));
+					_logger.LogError(ex, "Error processing {0}", pdf.FileName);
+				}
+
 				//var filePath = Path.GetTempFileName();
 				//using (var stream = System.IO.File.Create(filePath))
 				//{
 				//	await formFile.CopyToAsync(stream);
 				//}
 			}
+
+			// Exit on errors
+			if (ProcessingErrors.Count > 0)
+			{ return Page(); }
 
 			// download combined file
 			MemoryStream ms = new MemoryStream();

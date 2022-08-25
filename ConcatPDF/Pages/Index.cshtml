@@ -19,3 +19,15 @@
 	</dl>
 	<input asp-page-handler="Upload" type="submit" value="Spoji" />
 </form>
+
+@if (Model.ProcessingErrors.Count > 0)
+{
+	<h2 class="display-8">Molim ispravite!</h2>
+	<ul>
+		@foreach (var msg in Model.ProcessingErrors)
+		{
+			<li>@msg</li>
+		}
+	</ul>
+}
+
