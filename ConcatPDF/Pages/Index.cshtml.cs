@@ -35,7 +35,8 @@ namespace ConcatPDF.Pages
 
 			// Process uploaded files
 			// Don't rely on or trust the FileName property without validation.
-			foreach (var pdf in FileUpload.PDFFiles)
+			var sortedPDFs = FileUpload.PDFFiles.OrderBy(pdf => pdf.FileName);
+			foreach (var pdf in sortedPDFs)
 			{
 				if (0 == pdf.Length)
 				{
