@@ -26,7 +26,7 @@ namespace ConcatPDF.Pages
 			_logger.Log(LogLevel.Information, "Display combiner");
 		}
 
-		public async Task<IActionResult> OnPostUploadAsync()
+		public IActionResult OnPostUpload()
 		{
 			if (null == FileUpload.PDFFiles || !ModelState.IsValid)
 			{
@@ -75,12 +75,6 @@ namespace ConcatPDF.Pages
 					ProcessingErrors.Add(string.Format("PDF datoteka \"{0}\" je nesipravna!", pdf.FileName));
 					_logger.LogError(ex, "Error processing {0}", pdf.FileName);
 				}
-
-				//var filePath = Path.GetTempFileName();
-				//using (var stream = System.IO.File.Create(filePath))
-				//{
-				//	await formFile.CopyToAsync(stream);
-				//}
 			}
 
 			// Exit on errors
@@ -95,7 +89,6 @@ namespace ConcatPDF.Pages
 				MediaTypeNames.Application.Pdf,
 				WebUtility.HtmlEncode("combined.pdf")
 			);
-			//return RedirectToPage("./Index");
 		}
 	}
 
