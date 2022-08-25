@@ -97,7 +97,7 @@ namespace ConcatPDF.Pages
 	/// </summary>
 	public class BufferedMultipleFileUpload
 	{
-		[Required]
+		[Required(ErrorMessage = "Molim odaberite!")]
 		[Display(Name = "PDF datoteke za spajanje")]
 		public List<IFormFile>? PDFFiles { get; set; }
 
